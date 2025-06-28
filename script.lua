@@ -1,6 +1,6 @@
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/Jxereas/UI-Libraries/main/cerberus.lua"))()
 
-local window = Library.new("Liwo<font color='#c375ae'>.exe</font> - Universal") -- Args(<string> Name, <boolean?> ConstrainToScreen, <number?> Width, <number?> Height, <string?> VisibilityToggleKey)
+local window = Library.new("Liwo.exe - Universal") -- Args(<string> Name, <boolean?> ConstrainToScreen, <number?> Width, <number?> Height, <string?> VisibilityToggleKey)
 
 window:LockScreenBoundaries(true) -- Args(<boolean> ConstrainToScreen)
 
