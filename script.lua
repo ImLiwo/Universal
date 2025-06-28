@@ -345,6 +345,48 @@ CharacterSection:AddSlider({
     end
 }):SetValue(70)
 
+CharacterSection:AddToggle({
+    text = "Fly",
+    state = false,
+    risky = true,
+    tooltip = "Fly around the map using CFrame",
+    flag = "player_fly",
+    callback = function(v)
+        flags["player_fly"] = v
+    end
+}):AddBind({
+    enabled = true,
+    text = "Fly Key",
+    tooltip = "Key to toggle fly on/off",
+    mode = "toggle",
+    bind = "F3",
+    flag = "fly_key",
+    state = false,
+    nomouse = false,
+    risky = true,
+    noindicator = false,
+    callback = function(v)
+        flags["fly_key"] = v
+    end,
+    keycallback = function(v)
+        if v then
+            flags["player_fly"] = not flags["player_fly"]
+        end
+    end
+})
+
+CharacterSection:AddSlider({
+    text = "Fly Speed",
+    min = 10,
+    max = 100,
+    increment = 1,
+    suffix = "",
+    flag = "fly_speed",
+    callback = function(v)
+        flags["fly_speed"] = v
+    end
+}):SetValue(50)
+
 
 
 CharacterSection:AddToggle({
@@ -574,6 +616,90 @@ end)
 local originalValues = {
     fov = 70
 }
+
+-- Fly System
+local flyEnabled = false
+local bodyVelocity = nil
+local bodyAngularVelocity = nil
+local flyKeys = {
+    W = false,
+    A = false,
+    S = false,
+    D = false,
+    Space = false,
+    LeftShift = false
+}
+
+local function enableFly()
+    if localPlayer.Character and localPlayer.Character:FindFirstChild("HumanoidRootPart") then
+        local hrp = localPlayer.Character.HumanoidRootPart
+        
+        -- Create BodyVelocity for smooth movement
+        bodyVelocity = Instance.new("BodyVelocity")
+        bodyVelocity.MaxForce = Vector3.new(4000, 4000, 4000)
+        bodyVelocity.Velocity = Vector3.new(0, 0, 0)
+        bodyVelocity.Parent = hrp
+        
+        -- Create BodyAngularVelocity to prevent spinning
+        bodyAngularVelocity = Instance.new("BodyAngularVelocity")
+        bodyAngularVelocity.MaxTorque = Vector3.new(4000, 4000, 4000)
+        bodyAngularVelocity.AngularVelocity = Vector3.new(0, 0, 0)
+        bodyAngularVelocity.Parent = hrp
+        
+        flyEnabled = true
+        print("Fly enabled")
+    end
+end
+
+local function disableFly()
+    if bodyVelocity then
+        bodyVelocity:Destroy()
+        bodyVelocity = nil
+    end
+    if bodyAngularVelocity then
+        bodyAngularVelocity:Destroy()
+        bodyAngularVelocity = nil
+    end
+    flyEnabled = false
+    print("Fly disabled")
+end
+
+-- Input handling for fly
+inputService.InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed then return end
+    
+    if input.KeyCode == Enum.KeyCode.W then
+        flyKeys.W = true
+    elseif input.KeyCode == Enum.KeyCode.A then
+        flyKeys.A = true
+    elseif input.KeyCode == Enum.KeyCode.S then
+        flyKeys.S = true
+    elseif input.KeyCode == Enum.KeyCode.D then
+        flyKeys.D = true
+    elseif input.KeyCode == Enum.KeyCode.Space then
+        flyKeys.Space = true
+    elseif input.KeyCode == Enum.KeyCode.LeftShift then
+        flyKeys.LeftShift = true
+    end
+end)
+
+inputService.InputEnded:Connect(function(input, gameProcessed)
+    if gameProcessed then return end
+    
+    if input.KeyCode == Enum.KeyCode.W then
+        flyKeys.W = false
+    elseif input.KeyCode == Enum.KeyCode.A then
+        flyKeys.A = false
+    elseif input.KeyCode == Enum.KeyCode.S then
+        flyKeys.S = false
+    elseif input.KeyCode == Enum.KeyCode.D then
+        flyKeys.D = false
+    elseif input.KeyCode == Enum.KeyCode.Space then
+        flyKeys.Space = false
+    elseif input.KeyCode == Enum.KeyCode.LeftShift then
+        flyKeys.LeftShift = false
+    end
+end)
 
 
 
