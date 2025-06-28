@@ -423,7 +423,72 @@ do
             Enabled = false
         })
         
-        espElements = {Name, Distance, Box, Healthbar, HealthbarBG, Chams}
+        -- Corner box elements
+        local LeftTop = Functions:Create("Frame", {
+            Parent = ScreenGui, 
+            Name = plr.Name .. "_LeftTop",
+            BackgroundColor3 = ESP.Drawing.Boxes.Corner.RGB, 
+            BorderSizePixel = 0,
+            Visible = false
+        })
+        
+        local LeftSide = Functions:Create("Frame", {
+            Parent = ScreenGui, 
+            Name = plr.Name .. "_LeftSide",
+            BackgroundColor3 = ESP.Drawing.Boxes.Corner.RGB, 
+            BorderSizePixel = 0,
+            Visible = false
+        })
+        
+        local RightTop = Functions:Create("Frame", {
+            Parent = ScreenGui, 
+            Name = plr.Name .. "_RightTop",
+            BackgroundColor3 = ESP.Drawing.Boxes.Corner.RGB, 
+            BorderSizePixel = 0,
+            Visible = false
+        })
+        
+        local RightSide = Functions:Create("Frame", {
+            Parent = ScreenGui, 
+            Name = plr.Name .. "_RightSide",
+            BackgroundColor3 = ESP.Drawing.Boxes.Corner.RGB, 
+            BorderSizePixel = 0,
+            Visible = false
+        })
+        
+        local BottomSide = Functions:Create("Frame", {
+            Parent = ScreenGui, 
+            Name = plr.Name .. "_BottomSide",
+            BackgroundColor3 = ESP.Drawing.Boxes.Corner.RGB, 
+            BorderSizePixel = 0,
+            Visible = false
+        })
+        
+        local BottomDown = Functions:Create("Frame", {
+            Parent = ScreenGui, 
+            Name = plr.Name .. "_BottomDown",
+            BackgroundColor3 = ESP.Drawing.Boxes.Corner.RGB, 
+            BorderSizePixel = 0,
+            Visible = false
+        })
+        
+        local BottomRightSide = Functions:Create("Frame", {
+            Parent = ScreenGui, 
+            Name = plr.Name .. "_BottomRightSide",
+            BackgroundColor3 = ESP.Drawing.Boxes.Corner.RGB, 
+            BorderSizePixel = 0,
+            Visible = false
+        })
+        
+        local BottomRightDown = Functions:Create("Frame", {
+            Parent = ScreenGui, 
+            Name = plr.Name .. "_BottomRightDown",
+            BackgroundColor3 = ESP.Drawing.Boxes.Corner.RGB, 
+            BorderSizePixel = 0,
+            Visible = false
+        })
+        
+        espElements = {Name, Distance, Box, Healthbar, HealthbarBG, Chams, LeftTop, LeftSide, RightTop, RightSide, BottomSide, BottomDown, BottomRightSide, BottomRightDown}
         ESPObjects[plr] = espElements
         
         local function UpdateESP()
@@ -508,6 +573,76 @@ do
                     if Box then Box.Visible = false end
                 end
                 
+                -- Update Corner Boxes
+                if ESP.Drawing.Boxes.Corner.Enabled then
+                    local cornerLength = math.max(w / 5, 8)
+                    
+                    -- Left Top Corner
+                    if LeftTop then
+                        LeftTop.Position = UDim2.new(0, Pos.X - w / 2, 0, Pos.Y - h / 2)
+                        LeftTop.Size = UDim2.new(0, cornerLength, 0, 2)
+                        LeftTop.BackgroundColor3 = ESP.Drawing.Boxes.Corner.RGB
+                        LeftTop.Visible = true
+                    end
+                    
+                    if LeftSide then
+                        LeftSide.Position = UDim2.new(0, Pos.X - w / 2, 0, Pos.Y - h / 2)
+                        LeftSide.Size = UDim2.new(0, 2, 0, cornerLength)
+                        LeftSide.BackgroundColor3 = ESP.Drawing.Boxes.Corner.RGB
+                        LeftSide.Visible = true
+                    end
+                    
+                    -- Right Top Corner
+                    if RightTop then
+                        RightTop.Position = UDim2.new(0, Pos.X + w / 2 - cornerLength, 0, Pos.Y - h / 2)
+                        RightTop.Size = UDim2.new(0, cornerLength, 0, 2)
+                        RightTop.BackgroundColor3 = ESP.Drawing.Boxes.Corner.RGB
+                        RightTop.Visible = true
+                    end
+                    
+                    if RightSide then
+                        RightSide.Position = UDim2.new(0, Pos.X + w / 2 - 2, 0, Pos.Y - h / 2)
+                        RightSide.Size = UDim2.new(0, 2, 0, cornerLength)
+                        RightSide.BackgroundColor3 = ESP.Drawing.Boxes.Corner.RGB
+                        RightSide.Visible = true
+                    end
+                    
+                    -- Bottom Left Corner
+                    if BottomSide then
+                        BottomSide.Position = UDim2.new(0, Pos.X - w / 2, 0, Pos.Y + h / 2 - cornerLength)
+                        BottomSide.Size = UDim2.new(0, 2, 0, cornerLength)
+                        BottomSide.BackgroundColor3 = ESP.Drawing.Boxes.Corner.RGB
+                        BottomSide.Visible = true
+                    end
+                    
+                    if BottomDown then
+                        BottomDown.Position = UDim2.new(0, Pos.X - w / 2, 0, Pos.Y + h / 2 - 2)
+                        BottomDown.Size = UDim2.new(0, cornerLength, 0, 2)
+                        BottomDown.BackgroundColor3 = ESP.Drawing.Boxes.Corner.RGB
+                        BottomDown.Visible = true
+                    end
+                    
+                    -- Bottom Right Corner
+                    if BottomRightSide then
+                        BottomRightSide.Position = UDim2.new(0, Pos.X + w / 2 - 2, 0, Pos.Y + h / 2 - cornerLength)
+                        BottomRightSide.Size = UDim2.new(0, 2, 0, cornerLength)
+                        BottomRightSide.BackgroundColor3 = ESP.Drawing.Boxes.Corner.RGB
+                        BottomRightSide.Visible = true
+                    end
+                    
+                    if BottomRightDown then
+                        BottomRightDown.Position = UDim2.new(0, Pos.X + w / 2 - cornerLength, 0, Pos.Y + h / 2 - 2)
+                        BottomRightDown.Size = UDim2.new(0, cornerLength, 0, 2)
+                        BottomRightDown.BackgroundColor3 = ESP.Drawing.Boxes.Corner.RGB
+                        BottomRightDown.Visible = true
+                    end
+                else
+                    -- Hide corner boxes when disabled
+                    for _, cornerBox in pairs({LeftTop, LeftSide, RightTop, RightSide, BottomSide, BottomDown, BottomRightSide, BottomRightDown}) do
+                        if cornerBox then cornerBox.Visible = false end
+                    end
+                end
+                
                 -- Update Health Bar
                 if ESP.Drawing.Healthbar.Enabled and Healthbar and HealthbarBG then
                     local health = Humanoid.Health / Humanoid.MaxHealth
@@ -562,7 +697,7 @@ do
                 -- Apply distance fade
                 if ESP.FadeOut.OnDistance then
                     local transparency = math.max(0.1, 1 - (Dist / ESP.MaxDistance))
-                    for _, element in pairs({Name, Distance, Box, Healthbar, HealthbarBG}) do
+                    for _, element in pairs({Name, Distance, Box, Healthbar, HealthbarBG, LeftTop, LeftSide, RightTop, RightSide, BottomSide, BottomDown, BottomRightSide, BottomRightDown}) do
                         if element and element.Visible then
                             if element.ClassName == "TextLabel" then
                                 element.TextTransparency = 1 - transparency
