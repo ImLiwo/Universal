@@ -331,171 +331,287 @@ do
         Name = "ESPHolder",
     })
 
-    local DupeCheck = function(plr)
-        if ScreenGui:FindFirstChild(plr.Name) then
-            ScreenGui[plr.Name]:Destroy()
-        end
-    end
+    local ESPObjects = {}
 
-    local ESP_Function = function(plr)
-        if not ESP.Enabled then return end
-        coroutine.wrap(DupeCheck)(plr)
+    local function ESP_Function(plr)
+        if plr == lplayer then return end
         
-        local Name = Functions:Create("TextLabel", {Parent = ScreenGui, Position = UDim2.new(0.5, 0, 0, -11), Size = UDim2.new(0, 100, 0, 20), AnchorPoint = Vector2.new(0.5, 0.5), BackgroundTransparency = 1, TextColor3 = Color3.fromRGB(255, 255, 255), Font = Enum.Font.Code, TextSize = ESP.FontSize, TextStrokeTransparency = 0, TextStrokeColor3 = Color3.fromRGB(0, 0, 0), RichText = true})
-        local Distance = Functions:Create("TextLabel", {Parent = ScreenGui, Position = UDim2.new(0.5, 0, 0, 11), Size = UDim2.new(0, 100, 0, 20), AnchorPoint = Vector2.new(0.5, 0.5), BackgroundTransparency = 1, TextColor3 = Color3.fromRGB(255, 255, 255), Font = Enum.Font.Code, TextSize = ESP.FontSize, TextStrokeTransparency = 0, TextStrokeColor3 = Color3.fromRGB(0, 0, 0), RichText = true})
-        local Box = Functions:Create("Frame", {Parent = ScreenGui, BackgroundColor3 = Color3.fromRGB(0, 0, 0), BackgroundTransparency = 0.75, BorderSizePixel = 0})
-        local Outline = Functions:Create("UIStroke", {Parent = Box, Enabled = ESP.Drawing.Boxes.Gradient, Transparency = 0, Color = Color3.fromRGB(255, 255, 255), LineJoinMode = Enum.LineJoinMode.Miter})
-        local Healthbar = Functions:Create("Frame", {Parent = ScreenGui, BackgroundColor3 = Color3.fromRGB(255, 255, 255), BackgroundTransparency = 0})
-        local BehindHealthbar = Functions:Create("Frame", {Parent = ScreenGui, ZIndex = -1, BackgroundColor3 = Color3.fromRGB(0, 0, 0), BackgroundTransparency = 0})
-        local Chams = Functions:Create("Highlight", {Parent = ScreenGui, FillTransparency = 1, OutlineTransparency = 0, OutlineColor = Color3.fromRGB(119, 120, 255), DepthMode = "AlwaysOnTop"})
-        
-        -- Corner box elements
-        local LeftTop = Functions:Create("Frame", {Parent = ScreenGui, BackgroundColor3 = ESP.Drawing.Boxes.Corner.RGB, Position = UDim2.new(0, 0, 0, 0)})
-        local LeftSide = Functions:Create("Frame", {Parent = ScreenGui, BackgroundColor3 = ESP.Drawing.Boxes.Corner.RGB, Position = UDim2.new(0, 0, 0, 0)})
-        local RightTop = Functions:Create("Frame", {Parent = ScreenGui, BackgroundColor3 = ESP.Drawing.Boxes.Corner.RGB, Position = UDim2.new(0, 0, 0, 0)})
-        local RightSide = Functions:Create("Frame", {Parent = ScreenGui, BackgroundColor3 = ESP.Drawing.Boxes.Corner.RGB, Position = UDim2.new(0, 0, 0, 0)})
-        local BottomSide = Functions:Create("Frame", {Parent = ScreenGui, BackgroundColor3 = ESP.Drawing.Boxes.Corner.RGB, Position = UDim2.new(0, 0, 0, 0)})
-        local BottomDown = Functions:Create("Frame", {Parent = ScreenGui, BackgroundColor3 = ESP.Drawing.Boxes.Corner.RGB, Position = UDim2.new(0, 0, 0, 0)})
-        local BottomRightSide = Functions:Create("Frame", {Parent = ScreenGui, BackgroundColor3 = ESP.Drawing.Boxes.Corner.RGB, Position = UDim2.new(0, 0, 0, 0)})
-        local BottomRightDown = Functions:Create("Frame", {Parent = ScreenGui, BackgroundColor3 = ESP.Drawing.Boxes.Corner.RGB, Position = UDim2.new(0, 0, 0, 0)})
-
-        local Updater = function()
-            local Connection
-            local function HideESP()
-                Box.Visible = false
-                Name.Visible = false
-                Distance.Visible = false
-                Healthbar.Visible = false
-                BehindHealthbar.Visible = false
-                LeftTop.Visible = false
-                LeftSide.Visible = false
-                BottomSide.Visible = false
-                BottomDown.Visible = false
-                RightTop.Visible = false
-                RightSide.Visible = false
-                BottomRightSide.Visible = false
-                BottomRightDown.Visible = false
-                Chams.Enabled = false
-                if not plr then
-                    ScreenGui:Destroy()
-                    Connection:Disconnect()
+        -- Clean up existing ESP for this player
+        if ESPObjects[plr] then
+            for _, obj in pairs(ESPObjects[plr]) do
+                if obj and obj.Destroy then
+                    obj:Destroy()
                 end
             end
-
-            Connection = Euphoria.RunService.RenderStepped:Connect(function()
-                if not ESP.Enabled then
+        end
+        
+        -- Create ESP elements for this player
+        local espElements = {}
+        
+        local Name = Functions:Create("TextLabel", {
+            Parent = ScreenGui, 
+            Name = plr.Name .. "_Name",
+            Position = UDim2.new(0, 0, 0, 0), 
+            Size = UDim2.new(0, 200, 0, 20), 
+            AnchorPoint = Vector2.new(0.5, 0.5), 
+            BackgroundTransparency = 1, 
+            TextColor3 = ESP.Drawing.Names.RGB, 
+            Font = Enum.Font.Code, 
+            TextSize = ESP.FontSize, 
+            TextStrokeTransparency = 0, 
+            TextStrokeColor3 = Color3.fromRGB(0, 0, 0), 
+            RichText = true,
+            Visible = false
+        })
+        
+        local Distance = Functions:Create("TextLabel", {
+            Parent = ScreenGui, 
+            Name = plr.Name .. "_Distance",
+            Position = UDim2.new(0, 0, 0, 0), 
+            Size = UDim2.new(0, 200, 0, 20), 
+            AnchorPoint = Vector2.new(0.5, 0.5), 
+            BackgroundTransparency = 1, 
+            TextColor3 = ESP.Drawing.Distances.RGB, 
+            Font = Enum.Font.Code, 
+            TextSize = ESP.FontSize, 
+            TextStrokeTransparency = 0, 
+            TextStrokeColor3 = Color3.fromRGB(0, 0, 0),
+            Visible = false
+        })
+        
+        local Box = Functions:Create("Frame", {
+            Parent = ScreenGui, 
+            Name = plr.Name .. "_Box",
+            BackgroundColor3 = ESP.Drawing.Boxes.Full.RGB, 
+            BackgroundTransparency = 0.75, 
+            BorderSizePixel = 0,
+            Visible = false
+        })
+        
+        local Outline = Functions:Create("UIStroke", {
+            Parent = Box, 
+            Transparency = 0, 
+            Color = Color3.fromRGB(255, 255, 255), 
+            LineJoinMode = Enum.LineJoinMode.Miter,
+            Thickness = 1
+        })
+        
+        local Healthbar = Functions:Create("Frame", {
+            Parent = ScreenGui, 
+            Name = plr.Name .. "_Health",
+            BackgroundColor3 = Color3.fromRGB(0, 255, 0), 
+            BorderSizePixel = 0,
+            Visible = false
+        })
+        
+        local HealthbarBG = Functions:Create("Frame", {
+            Parent = ScreenGui, 
+            Name = plr.Name .. "_HealthBG",
+            BackgroundColor3 = Color3.fromRGB(255, 0, 0), 
+            BorderSizePixel = 0,
+            Visible = false
+        })
+        
+        local Chams = Functions:Create("Highlight", {
+            Parent = ScreenGui, 
+            Name = plr.Name .. "_Chams",
+            FillTransparency = 0.5, 
+            OutlineTransparency = 0, 
+            FillColor = ESP.Drawing.Chams.FillRGB,
+            OutlineColor = ESP.Drawing.Chams.OutlineRGB, 
+            DepthMode = "AlwaysOnTop",
+            Enabled = false
+        })
+        
+        espElements = {Name, Distance, Box, Healthbar, HealthbarBG, Chams}
+        ESPObjects[plr] = espElements
+        
+        local function UpdateESP()
+            local connection
+            
+            local function HideESP()
+                for _, element in pairs(espElements) do
+                    if element and element.Parent then
+                        if element.ClassName == "Highlight" then
+                            element.Enabled = false
+                        else
+                            element.Visible = false
+                        end
+                    end
+                end
+            end
+            
+            connection = RunService.RenderStepped:Connect(function()
+                -- Check if ESP is enabled and player exists
+                if not ESP.Enabled or not plr or not plr.Parent then
                     HideESP()
                     return
                 end
                 
-                if plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
-                    local HRP = plr.Character.HumanoidRootPart
-                    local Humanoid = plr.Character:WaitForChild("Humanoid")
-                    local Pos, OnScreen = Cam:WorldToScreenPoint(HRP.Position)
-                    local Dist = (Cam.CFrame.Position - HRP.Position).Magnitude / 3.5714285714
+                -- Check if player has character
+                if not plr.Character or not plr.Character:FindFirstChild("HumanoidRootPart") or not plr.Character:FindFirstChild("Humanoid") then
+                    HideESP()
+                    return
+                end
+                
+                local HRP = plr.Character.HumanoidRootPart
+                local Humanoid = plr.Character.Humanoid
+                local Pos, OnScreen = Cam:WorldToScreenPoint(HRP.Position)
+                local Dist = (Cam.CFrame.Position - HRP.Position).Magnitude / 3.5714285714
+                
+                -- Check if player is on screen and within distance
+                if not OnScreen or Dist > ESP.MaxDistance then
+                    HideESP()
+                    return
+                end
+                
+                -- Team check - simplified logic
+                local showESP = true
+                if ESP.TeamCheck then
+                    if lplayer.Team and plr.Team and lplayer.Team == plr.Team then
+                        showESP = false
+                    end
+                end
+                
+                if not showESP then
+                    HideESP()
+                    return
+                end
+                
+                -- Calculate ESP dimensions
+                local Size = HRP.Size.Y
+                local scaleFactor = (Size * Cam.ViewportSize.Y) / (Pos.Z * 2)
+                local w, h = math.max(3 * scaleFactor, 4), math.max(4.5 * scaleFactor, 6)
+                
+                -- Update Chams
+                if ESP.Drawing.Chams.Enabled and Chams then
+                    Chams.Adornee = plr.Character
+                    Chams.Enabled = true
+                    Chams.FillColor = ESP.Drawing.Chams.FillRGB
+                    Chams.OutlineColor = ESP.Drawing.Chams.OutlineRGB
                     
-                    if OnScreen and Dist <= ESP.MaxDistance then
-                        local Size = HRP.Size.Y
-                        local scaleFactor = (Size * Cam.ViewportSize.Y) / (Pos.Z * 2)
-                        local w, h = 3 * scaleFactor, 4.5 * scaleFactor
-
-                        -- Fade-out effect
-                        if ESP.FadeOut.OnDistance then
-                            Functions:FadeOutOnDist(Box, Dist)
-                            Functions:FadeOutOnDist(Outline, Dist)
-                            Functions:FadeOutOnDist(Name, Dist)
-                            Functions:FadeOutOnDist(Distance, Dist)
-                            Functions:FadeOutOnDist(Healthbar, Dist)
-                            Functions:FadeOutOnDist(BehindHealthbar, Dist)
-                            Functions:FadeOutOnDist(Chams, Dist)
-                        end
-
-                        -- Team/Enemy Check
-                        if ESP.TeamCheck and plr ~= lplayer and ((lplayer.Team ~= plr.Team and plr.Team) or (not lplayer.Team and not plr.Team)) and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") and plr.Character:FindFirstChild("Humanoid") then
-
-                            -- Chams
-                            if ESP.Drawing.Chams.Enabled then
-                                Chams.Adornee = plr.Character
-                                Chams.Enabled = true
-                                Chams.FillColor = ESP.Drawing.Chams.FillRGB
-                                Chams.OutlineColor = ESP.Drawing.Chams.OutlineRGB
-                                
-                                if ESP.Drawing.Chams.Thermal then
-                                    local breathe_effect = math.atan(math.sin(tick() * 2)) * 2 / math.pi
-                                    Chams.FillTransparency = ESP.Drawing.Chams.Fill_Transparency * breathe_effect * 0.01
-                                    Chams.OutlineTransparency = ESP.Drawing.Chams.Outline_Transparency * breathe_effect * 0.01
-                                end
-                            end
-
-                            -- Boxes
-                            if ESP.Drawing.Boxes.Full.Enabled then
-                                Box.Position = UDim2.new(0, Pos.X - w / 2, 0, Pos.Y - h / 2)
-                                Box.Size = UDim2.new(0, w, 0, h)
-                                Box.Visible = true
-                            end
-
-                            -- Corner Boxes
-                            if ESP.Drawing.Boxes.Corner.Enabled then
-                                LeftTop.Visible = true
-                                LeftTop.Position = UDim2.new(0, Pos.X - w / 2, 0, Pos.Y - h / 2)
-                                LeftTop.Size = UDim2.new(0, w / 5, 0, 1)
-                                
-                                LeftSide.Visible = true
-                                LeftSide.Position = UDim2.new(0, Pos.X - w / 2, 0, Pos.Y - h / 2)
-                                LeftSide.Size = UDim2.new(0, 1, 0, h / 5)
-                            end
-
-                            -- Health Bar
-                            if ESP.Drawing.Healthbar.Enabled then
-                                local health = Humanoid.Health / Humanoid.MaxHealth
-                                Healthbar.Visible = true
-                                Healthbar.Position = UDim2.new(0, Pos.X - w / 2 - 6, 0, Pos.Y - h / 2 + h * (1 - health))
-                                Healthbar.Size = UDim2.new(0, ESP.Drawing.Healthbar.Width, 0, h * health)
-                                
-                                BehindHealthbar.Visible = true
-                                BehindHealthbar.Position = UDim2.new(0, Pos.X - w / 2 - 6, 0, Pos.Y - h / 2)
-                                BehindHealthbar.Size = UDim2.new(0, ESP.Drawing.Healthbar.Width, 0, h)
-                            end
-
-                            -- Names
-                            if ESP.Drawing.Names.Enabled then
-                                Name.Visible = true
-                                if ESP.Options.Friendcheck and lplayer:IsFriendsWith(plr.UserId) then
-                                    Name.Text = string.format('(<font color="rgb(%d, %d, %d)">F</font>) %s', ESP.Options.FriendcheckRGB.R * 255, ESP.Options.FriendcheckRGB.G * 255, ESP.Options.FriendcheckRGB.B * 255, plr.Name)
-                                else
-                                    Name.Text = string.format('(<font color="rgb(%d, %d, %d)">E</font>) %s', 255, 0, 0, plr.Name)
-                                end
-                                Name.Position = UDim2.new(0, Pos.X, 0, Pos.Y - h / 2 - 9)
-                            end
-                            
-                            -- Distance
-                            if ESP.Drawing.Distances.Enabled then
-                                Distance.Position = UDim2.new(0, Pos.X, 0, Pos.Y + h / 2 + 7)
-                                Distance.Text = string.format("%d meters", math.floor(Dist))
-                                Distance.Visible = true
-                            end
-                        else
-                            HideESP()
-                        end
-                    else
-                        HideESP()
+                    if ESP.Drawing.Chams.Thermal then
+                        local breathe_effect = math.abs(math.sin(tick() * 2))
+                        Chams.FillTransparency = 0.3 + (breathe_effect * 0.3)
+                        Chams.OutlineTransparency = 0.1 + (breathe_effect * 0.2)
                     end
                 else
-                    HideESP()
+                    if Chams then Chams.Enabled = false end
+                end
+                
+                -- Update Boxes
+                if ESP.Drawing.Boxes.Full.Enabled and Box then
+                    Box.Position = UDim2.new(0, Pos.X - w / 2, 0, Pos.Y - h / 2)
+                    Box.Size = UDim2.new(0, w, 0, h)
+                    Box.Visible = true
+                else
+                    if Box then Box.Visible = false end
+                end
+                
+                -- Update Health Bar
+                if ESP.Drawing.Healthbar.Enabled and Healthbar and HealthbarBG then
+                    local health = Humanoid.Health / Humanoid.MaxHealth
+                    
+                    HealthbarBG.Position = UDim2.new(0, Pos.X - w / 2 - 6, 0, Pos.Y - h / 2)
+                    HealthbarBG.Size = UDim2.new(0, 3, 0, h)
+                    HealthbarBG.Visible = true
+                    
+                    Healthbar.Position = UDim2.new(0, Pos.X - w / 2 - 6, 0, Pos.Y - h / 2 + h * (1 - health))
+                    Healthbar.Size = UDim2.new(0, 3, 0, h * health)
+                    Healthbar.Visible = true
+                    
+                    -- Color based on health
+                    if health > 0.6 then
+                        Healthbar.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+                    elseif health > 0.3 then
+                        Healthbar.BackgroundColor3 = Color3.fromRGB(255, 255, 0)
+                    else
+                        Healthbar.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+                    end
+                else
+                    if Healthbar then Healthbar.Visible = false end
+                    if HealthbarBG then HealthbarBG.Visible = false end
+                end
+                
+                -- Update Names
+                if ESP.Drawing.Names.Enabled and Name then
+                    Name.Position = UDim2.new(0, Pos.X, 0, Pos.Y - h / 2 - 16)
+                    if ESP.Options.Friendcheck and lplayer:IsFriendsWith(plr.UserId) then
+                        Name.Text = string.format('<font color="rgb(0,255,0)">[F]</font> %s', plr.Name)
+                    else
+                        Name.Text = string.format('<font color="rgb(255,0,0)">[E]</font> %s', plr.Name)
+                    end
+                    Name.TextColor3 = ESP.Drawing.Names.RGB
+                    Name.TextSize = ESP.FontSize
+                    Name.Visible = true
+                else
+                    if Name then Name.Visible = false end
+                end
+                
+                -- Update Distance
+                if ESP.Drawing.Distances.Enabled and Distance then
+                    Distance.Position = UDim2.new(0, Pos.X, 0, Pos.Y + h / 2 + 4)
+                    Distance.Text = string.format("%d meters", math.floor(Dist))
+                    Distance.TextColor3 = ESP.Drawing.Distances.RGB
+                    Distance.TextSize = ESP.FontSize
+                    Distance.Visible = true
+                else
+                    if Distance then Distance.Visible = false end
+                end
+                
+                -- Apply distance fade
+                if ESP.FadeOut.OnDistance then
+                    local transparency = math.max(0.1, 1 - (Dist / ESP.MaxDistance))
+                    for _, element in pairs({Name, Distance, Box, Healthbar, HealthbarBG}) do
+                        if element and element.Visible then
+                            if element.ClassName == "TextLabel" then
+                                element.TextTransparency = 1 - transparency
+                            elseif element.ClassName == "Frame" then
+                                element.BackgroundTransparency = element == Box and (0.75 + (1 - transparency) * 0.25) or (1 - transparency)
+                            end
+                        end
+                    end
+                end
+            end)
+            
+            -- Clean up connection when player leaves
+            plr.AncestryChanged:Connect(function()
+                if not plr.Parent then
+                    connection:Disconnect()
+                    if ESPObjects[plr] then
+                        for _, obj in pairs(ESPObjects[plr]) do
+                            if obj and obj.Destroy then
+                                obj:Destroy()
+                            end
+                        end
+                        ESPObjects[plr] = nil
+                    end
                 end
             end)
         end
-        coroutine.wrap(Updater)()
+        
+        spawn(UpdateESP)
     end
-
-    -- Update ESP for all players
-    for _, v in pairs(Players:GetPlayers()) do
-        if v.Name ~= lplayer.Name then
-            coroutine.wrap(ESP_Function)(v)
+    
+    -- Initialize ESP for existing players
+    for _, player in pairs(Players:GetPlayers()) do
+        if player ~= lplayer then
+            ESP_Function(player)
         end
     end
-
-    Players.PlayerAdded:Connect(function(v)
-        coroutine.wrap(ESP_Function)(v)
+    
+    -- Initialize ESP for new players
+    Players.PlayerAdded:Connect(ESP_Function)
+    
+    -- Clean up when players leave
+    Players.PlayerRemoving:Connect(function(plr)
+        if ESPObjects[plr] then
+            for _, obj in pairs(ESPObjects[plr]) do
+                if obj and obj.Destroy then
+                    obj:Destroy()
+                end
+            end
+            ESPObjects[plr] = nil
+        end
     end)
 end
